@@ -5,7 +5,7 @@ const Header = () => {
     <div className="pt-6 flex justify-between items-center px-15 mb-6">
       <div className="info flex flex-col">
         <div className="flex items-center pb-9">
-          <img className="w-8" src="/assets/Frame 3.svg" alt="point" />
+          <img className="w-8" src="/assets/marker.svg" alt="point" />
           <p className="text-2xl">New York</p>
           <img className="w-5.25 h-7.5" src="/public/assets/Frame.svg" alt="" />
         </div>

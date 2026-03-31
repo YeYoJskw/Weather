@@ -2,6 +2,9 @@ import React, { useMemo } from 'react';
 import WeatherService from './API/WeatherService';
 import WeatherIcon from './WeatherIcon';
 import { useQuery } from '@tanstack/react-query';
+import WeatherSkeleton from './WeatherSkeleton';
+
+import 'react-loading-skeleton/dist/skeleton.css';
 import {
   Carousel,
   CarouselContent,
@@ -84,6 +87,14 @@ const AirConditions = () => {
 
   const todayForecast = groupedForecast[todayDate];
 
+  if (error) {
+    return <div>Error loading weather data</div>;
+  }
+
+  if (isLoading) {
+    return <WeatherSkeleton />;
+  }
+
   return (
     <div className="w-81 h-134.25 bg-[#DEAB4D] rounded-[35px] p-6">
       {isLoading ? (
@@ -121,7 +132,7 @@ const AirConditions = () => {
             <img src="/public/assets/temperature.svg" alt="" />
             <div className="flex flex-col">
               <p>Real Feel</p>
-              <p>{todayForecast?.main.feels_like.toFixed(0)}°C</p>
+              <p>{todayForecast.main.feels_like.toFixed(1)}°C</p>
             </div>
           </div>
           <div className="flex  items-center gap-2">
