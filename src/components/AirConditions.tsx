@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 import WeatherService from './API/WeatherService';
 import WeatherIcon from './WeatherIcon';
-import { useEffect, useState } from 'react';
-import { useFetching } from '@/hooks/useFetching';
+import { useQuery } from '@tanstack/react-query';
 import {
   Carousel,
   CarouselContent,
@@ -33,54 +32,57 @@ interface WeatherList {
 }
 
 const AirConditions = () => {
-  const [weather, setWeather] = useState<WeatherList | null>(null);
-  const [groupedForecast, setGroupedForecast] = useState<
-    Record<string, WeatherItem>
-  >({});
   const todayDate = new Date().toLocaleDateString('en-CA');
-  const todayForecast = groupedForecast[todayDate];
 
-  const [fetchWeather, isLoading, error] = useFetching(async () => {
-    const response = await WeatherService.getWeather('Bishkek');
-    setWeather(response.data);
+  const {
+    data: weather,
+    isLoading,
+    error,
+  } = useQuery<WeatherList>({
+    queryKey: ['weather', 'Moscow'],
+    queryFn: () => WeatherService.getWeather('Moscow'),
   });
 
-  useMemo(() => {
-    if (!weather) return;
+  const groupedForecast = useMemo(() => {
+    if (!weather) return {};
 
     const grouped: Record<string, WeatherItem[]> = {};
     const dailySummary: Record<string, WeatherItem> = {};
 
     for (const forecast of weather.list) {
       const date = forecast.dt_txt.split(' ')[0];
-      if (!grouped[date]) grouped[date] = [];
+      if (!grouped[date]) {
+        grouped[date] = [];
+      }
       grouped[date].push(forecast);
     }
 
     for (const [date, forecasts] of Object.entries(grouped)) {
+      console.log(`Processing date: ${date} with ${forecasts} forecasts`);
       const middayIndex = Math.floor(forecasts.length / 2);
       const avgTemp =
         forecasts.reduce((sum, f) => sum + f.main.temp, 0) / forecasts.length;
       const avgWindSpeed =
         forecasts.reduce((sum, f) => sum + f.wind.speed, 0) / forecasts.length;
+      const avgFeelsLike =
+        forecasts.reduce((sum, f) => sum + f.main.feels_like, 0) /
+        forecasts.length;
 
       dailySummary[date] = {
         ...forecasts[middayIndex],
-        main: { ...forecasts[middayIndex].main, temp: avgTemp },
+        main: {
+          ...forecasts[middayIndex].main,
+          temp: avgTemp,
+          feels_like: avgFeelsLike,
+        },
         wind: { ...forecasts[middayIndex].wind, speed: avgWindSpeed },
       };
     }
     console.log('Daily Summary:', dailySummary);
-    setGroupedForecast(dailySummary);
+    return dailySummary;
   }, [weather]);
 
-  useEffect(() => {
-    fetchWeather();
-  }, []);
-
-  if (error) {
-    return <div>{error}</div>;
-  }
+  const todayForecast = groupedForecast[todayDate];
 
   return (
     <div className="w-81 h-134.25 bg-[#DEAB4D] rounded-[35px] p-6">
@@ -119,7 +121,7 @@ const AirConditions = () => {
             <img src="/public/assets/temperature.svg" alt="" />
             <div className="flex flex-col">
               <p>Real Feel</p>
-              <p>{todayForecast?.main.temp.toFixed(0)}°C</p>
+              <p>{todayForecast?.main.feels_like.toFixed(0)}°C</p>
             </div>
           </div>
           <div className="flex  items-center gap-2">
