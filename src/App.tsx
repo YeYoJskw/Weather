@@ -1,9 +1,9 @@
 import './App.css';
-import Header from './components/Header';
-import SideBar from './components/SideBar';
-import Activities from './components/Activities';
-import AirConditions from './components/AirConditions';
-import Forecast from './components/Forecast';
+import Header from './components/Header/Header';
+import SideBar from './components/SideBar/SideBar';
+import Activities from './components/Activities/Activities';
+import AirConditions from './components/AirConditions/AirConditions';
+import Forecast from './components/Forecast/Forecast';
 
 function App() {
   return (
