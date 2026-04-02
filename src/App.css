@@ -68,3 +68,18 @@ body {
     transparent
   );
 }
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: none;
+  font-size: 24px;
+}
+
+select:focus,
+select:active {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
