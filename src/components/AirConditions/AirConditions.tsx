@@ -12,6 +12,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { useCityStore } from '@/store';
 
 interface WeatherItem {
   main: {
@@ -35,15 +36,15 @@ interface WeatherList {
 }
 
 const AirConditions = () => {
-  const todayDate = new Date().toLocaleDateString('en-CA');
+  const city = useCityStore((state) => state.city);
 
   const {
     data: weather,
     isLoading,
     error,
   } = useQuery<WeatherList>({
-    queryKey: ['weather', 'Moscow'],
-    queryFn: () => WeatherService.getWeather('Moscow'),
+    queryKey: ['weather', city],
+    queryFn: () => WeatherService.getWeather(city),
   });
 
   const groupedForecast = useMemo(() => {
@@ -85,7 +86,7 @@ const AirConditions = () => {
     return dailySummary;
   }, [weather]);
 
-  const todayForecast = groupedForecast[todayDate];
+  const currentForecast = weather?.list?.[0];
 
   if (error) {
     return <div>Error loading weather data</div>;
@@ -97,34 +98,30 @@ const AirConditions = () => {
 
   return (
     <div className="w-81 h-134.25 bg-[#DEAB4D] rounded-[35px] p-6">
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : (
-        <div>
-          <Carousel
-            opts={{
-              align: 'start',
-              loop: true,
-            }}
-            className="w-full carousel-mask"
-          >
-            <CarouselContent>
-              {Object.values(groupedForecast).map((day, idx) => (
-                <CarouselItem key={idx} className="basis-1/5">
-                  <div className="text-center text-white">
-                    <WeatherIcon icon={day.weather[0].icon} />
-                    {new Date(day.dt_txt).toLocaleDateString('en-US', {
-                      weekday: 'short',
-                    })}
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="absolute left-0 top-1/2 z-30 -translate-y-1/2" />
-            <CarouselNext className="absolute right-0 top-1/2 z-30 -translate-y-1/2" />
-          </Carousel>
-        </div>
-      )}
+      <div>
+        <Carousel
+          opts={{
+            align: 'start',
+            loop: true,
+          }}
+          className="w-full carousel-mask"
+        >
+          <CarouselContent>
+            {Object.values(groupedForecast).map((day, idx) => (
+              <CarouselItem key={idx} className="basis-1/5">
+                <div className="text-center text-white">
+                  <WeatherIcon icon={day.weather[0].icon} />
+                  {new Date(day.dt_txt).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                  })}
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="absolute left-0 top-1/2 z-30 -translate-y-1/2" />
+          <CarouselNext className="absolute right-0 top-1/2 z-30 -translate-y-1/2" />
+        </Carousel>
+      </div>
       <div className="pt-16">
         <div className="font-bold">Air Conditions</div>
         <div className="flex flex-col gap-8.5 mt-6">
@@ -132,21 +129,25 @@ const AirConditions = () => {
             <img src="/public/assets/temperature.svg" alt="" />
             <div className="flex flex-col">
               <p>Real Feel</p>
-              <p>{todayForecast.main.feels_like.toFixed(1)}°C</p>
+              <p>{currentForecast?.main.feels_like.toFixed(1)}°C</p>
             </div>
           </div>
           <div className="flex  items-center gap-2">
             <img src="/public/assets/wind.svg" alt="" />
             <div className="flex flex-col">
               <p>Wind</p>
-              <p>{todayForecast?.wind.speed.toFixed(1)} km/h</p>
+              <p>{currentForecast?.wind.speed.toFixed(1)} km/h</p>
             </div>
           </div>
           <div className="flex  items-center gap-2">
             <img src="/public/assets/water.svg" alt="" />
             <div className="flex flex-col">
               <p>Chance of rain</p>
-              <p>{todayForecast?.pop * 100}%</p>
+              <p className="text-white text-lg font-semibold">
+                {currentForecast?.pop !== undefined
+                  ? `${Math.round(currentForecast.pop * 100)}%`
+                  : '0%'}
+              </p>
             </div>
           </div>
           <div className="flex  items-center gap-2">
