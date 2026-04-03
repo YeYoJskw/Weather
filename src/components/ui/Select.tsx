@@ -10,7 +10,7 @@ interface SelectProps {
 const Select: FC<SelectProps> = ({ options, onChange, value }) => {
   return (
     <select
-      className="p-2 rounded"
+      className="pt-1 rounded"
       value={value}
       onChange={(e) => onChange(e.target.value)}
     >

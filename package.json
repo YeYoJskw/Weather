@@ -24,7 +24,7 @@
     "react-dom": "^19.2.4",
     "react-loading-skeleton": "^3.5.0",
     "react-slick": "^0.31.0",
-    "recharts": "^3.8.0",
+    "recharts": "^3.8.1",
     "shadcn": "^4.1.0",
     "slick-carousel": "^1.8.1",
     "swiper": "^12.1.2",
