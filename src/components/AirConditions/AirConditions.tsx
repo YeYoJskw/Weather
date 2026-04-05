@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import WeatherService from '../API/WeatherService';
 import WeatherIcon from '../WeatherIcon';
 import { useQuery } from '@tanstack/react-query';
 import AirConditionsSkeleton from './AirConditionsSkeleton';
+import { useGroupedForecast } from '@/hooks/useGroupedForecast';
 
 import 'react-loading-skeleton/dist/skeleton.css';
 import {
@@ -47,44 +48,7 @@ const AirConditions = () => {
     queryFn: () => WeatherService.getWeather(city),
   });
 
-  const groupedForecast = useMemo(() => {
-    if (!weather) return {};
-
-    const grouped: Record<string, WeatherItem[]> = {};
-    const dailySummary: Record<string, WeatherItem> = {};
-
-    for (const forecast of weather.list) {
-      const date = forecast.dt_txt.split(' ')[0];
-      if (!grouped[date]) {
-        grouped[date] = [];
-      }
-      grouped[date].push(forecast);
-    }
-
-    for (const [date, forecasts] of Object.entries(grouped)) {
-      console.log(`Processing date: ${date} with ${forecasts} forecasts`);
-      const middayIndex = Math.floor(forecasts.length / 2);
-      const avgTemp =
-        forecasts.reduce((sum, f) => sum + f.main.temp, 0) / forecasts.length;
-      const avgWindSpeed =
-        forecasts.reduce((sum, f) => sum + f.wind.speed, 0) / forecasts.length;
-      const avgFeelsLike =
-        forecasts.reduce((sum, f) => sum + f.main.feels_like, 0) /
-        forecasts.length;
-
-      dailySummary[date] = {
-        ...forecasts[middayIndex],
-        main: {
-          ...forecasts[middayIndex].main,
-          temp: avgTemp,
-          feels_like: avgFeelsLike,
-        },
-        wind: { ...forecasts[middayIndex].wind, speed: avgWindSpeed },
-      };
-    }
-    console.log('Daily Summary:', dailySummary);
-    return dailySummary;
-  }, [weather]);
+  const groupedForecast = useGroupedForecast(weather);
 
   const currentForecast = weather?.list?.[0];
 
