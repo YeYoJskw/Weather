@@ -39,11 +39,6 @@ const Header = () => {
         <div className="flex items-center pb-9 gap-2">
           <img className="w-8" src="/assets/marker.svg" alt="point" />
           <Select options={cities} onChange={onChangeCity} value={city} />
-          <img
-            className="w-5.25 h-7.5 p-0 m-0"
-            src="/public/assets/Frame.svg"
-            alt=""
-          />
         </div>
         <h2 className="text-5xl pb-26">
           {currentWeather?.weather[0].description}

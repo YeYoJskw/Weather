@@ -83,3 +83,14 @@ select:active {
   border: none;
   box-shadow: none;
 }
+
+.recharts-wrapper:focus,
+.recharts-surface:focus,
+.recharts-surface:focus-visible,
+.recharts-wrapper:focus-visible {
+  outline: none !important;
+}
+
+.line-chart:focus {
+  outline: none !important;
+}
